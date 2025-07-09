@@ -1,84 +1,256 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Budget Modal</title>
-<link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="registerSection">
-    <h3>Register</h3>
-    <input type="text" id="regUsername" placeholder="Choose a username" />
-    <input type="password" id="regPassword" placeholder="Choose a password" />
-    <button id="registerBtn">Register</button>
-  </div>
+// Elements
+const registerSection = document.getElementById("registerSection");
+const loginSection = document.getElementById("loginSection");
+const appSection = document.getElementById("appSection");
 
-  <div id="loginSection">
-    <h3>Login</h3>
-    <input type="text" id="username" placeholder="Enter your name" />
-    <button id="loginBtn">Login</button>
-  </div>
+const registerBtn = document.getElementById("registerBtn");
+const loginBtn = document.getElementById("loginBtn");
 
-  <div id="appSection" style="display:none;">
-    <button id="openModal">Open Budget Modal</button>
-  </div>
+const usernameInput = document.getElementById("username");
+const regUsernameInput = document.getElementById("regUsername");
+const regPasswordInput = document.getElementById("regPassword");
 
-  <div id="budgetModal" class="modal">
-    <div class="modal-content">
-      <h3>Monthly Budget</h3>
+const openModalBtn = document.getElementById("openModal");
+const modal = document.getElementById("budgetModal");
+const closeModalBtn = document.getElementById("closeModal");
 
-      <label>Income:</label><br />
-      <input type="number" id="income" placeholder="Enter income" /><br />
-      <button id="calculate">Calculate Remaining</button>
+const incomeInput = document.getElementById("income");
+const calculateBtn = document.getElementById("calculate");
 
-      <h4>Outgoings</h4>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Outgoing</th>
-              <th>Cost (£)</th>
-              <th>Date</th>
-              <th>Paid?</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody id="outgoingsTable"></tbody>
-          <tfoot>
-            <tr>
-              <td><strong>Paid Outgoings</strong></td>
-              <td colspan="4" id="paidOutgoings" style="font-weight:bold;">£0.00</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+const outgoingsTable = document.getElementById("outgoingsTable");
+const remainingOutgoingsEl = document.getElementById("remainingOutgoings");
+const disposableEl = document.getElementById("disposableIncome");
+const paidOutgoingsEl = document.getElementById("paidOutgoings");
 
-      <div>
-        <strong>Remaining Outgoings: £<span id="remainingOutgoings">0.00</span></strong>
-      </div>
+const addOutgoingBtn = document.getElementById("addOutgoing");
 
-      <p><strong>Disposable Income:</strong> <span id="disposableIncome">0.00</span></p>
-      <p id="warningMessage" style="color:red; font-weight:bold; display:none;"></p>
+const warningModal = document.getElementById("warningModal");
+const warningModalText = document.getElementById("warningModalText");
+const closeWarningModalBtn = document.getElementById("closeWarningModal");
 
-      <h4>Add Outgoing</h4>
-      <input type="text" id="newName" placeholder="Name" />
-      <input type="number" id="newAmount" placeholder="Amount" step="0.01" />
-      <input type="number" id="newDate" placeholder="Date" min="1" max="31" />
-      <button id="addOutgoing">➕ Add Outgoing</button>
+let currentUser = null;
 
-      <button id="closeModal">Close</button>
-    </div>
-  </div>
+// Default outgoings hardcoded
+const defaultOutgoings = [
+  { name: "CHILDCARE", amount: 150, date: 1 },
+  { name: "CRED", amount: 240, date: 1 },
+  { name: "KEEP", amount: 300, date: 1 },
+  { name: "LOTTOS", amount: 200, date: 1 },
+  { name: "VEHICLE TAX", amount: 60, date: 1 },
+  { name: "CAR INS", amount: 59, date: 1 },
+  { name: "CAPITAL ONE", amount: 17.8, date: 2 },
+  { name: "CAPITAL ONE", amount: 15.35, date: 2 },
+  { name: "ISA", amount: 200, date: 2 },
+  { name: "CREATION", amount: 28.29, date: 3 },
+  { name: "VOXI", amount: 10, date: 3 },
+  { name: "YOU FIBRE", amount: 29.99, date: 3 },
+  { name: "B/CARD", amount: 200, date: 6 },
+  { name: "VAN INS", amount: 49, date: 7 },
+  { name: "NETFLIX", amount: 12.99, date: 9 },
+  { name: "OVERDRAFT FEE", amount: 49, date: 18 },
+  { name: "EXPERIAN", amount: 14.99, date: 19 },
+  { name: "PHONE", amount: 10, date: 23 },
+  { name: "DIESEL", amount: 150, date: 27 },
+  { name: "FEE", amount: 5, date: 27 },
+  { name: "Rent", amount: 100, date: 1 },
+];
 
-  <div id="warningModal" class="modal">
-    <div class="modal-content">
-      <span id="closeWarningModal" style="float:right;cursor:pointer;font-size:1.5em;">&times;</span>
-      <h3>⚠️ Warning</h3>
-      <p id="warningModalText">Disposable income remaining is £0.00</p>
-    </div>
-  </div>
+let outgoings = [];
 
-  <script src="script.js"></script>
-</body>
-</html>
+// -------------------------
+// USER AUTH SIMPLIFIED
+// -------------------------
+
+registerBtn.onclick = () => {
+  const regUsername = regUsernameInput.value.trim();
+  const regPassword = regPasswordInput.value.trim();
+
+  if (!regUsername || !regPassword) {
+    alert("Please enter username and password to register.");
+    return;
+  }
+
+  if (localStorage.getItem(`user_${regUsername}`)) {
+    alert("Username already exists, please choose another.");
+    return;
+  }
+
+  localStorage.setItem(`user_${regUsername}`, regPassword);
+  alert("Registered! Please log in.");
+  regUsernameInput.value = "";
+  regPasswordInput.value = "";
+};
+
+loginBtn.onclick = () => {
+  const username = usernameInput.value.trim();
+  if (!username) {
+    alert("Please enter your username.");
+    return;
+  }
+
+  const storedPassword = localStorage.getItem(`user_${username}`);
+  if (!storedPassword) {
+    alert("User not found. Please register.");
+    return;
+  }
+
+  currentUser = username;
+  registerSection.style.display = "none";
+  loginSection.style.display = "none";
+  appSection.style.display = "block";
+
+  loadOutgoings();
+  renderOutgoings();
+  calculateRemaining();
+};
+
+// -------------------------
+// OUTGOINGS MANAGEMENT
+// -------------------------
+
+function loadOutgoings() {
+  const saved = localStorage.getItem(`outgoings_${currentUser}`);
+  if (saved) {
+    outgoings = JSON.parse(saved);
+  } else {
+    outgoings = defaultOutgoings.slice();
+    saveOutgoings();
+  }
+}
+
+function saveOutgoings() {
+  localStorage.setItem(`outgoings_${currentUser}`, JSON.stringify(outgoings));
+}
+
+function renderOutgoings() {
+  outgoingsTable.innerHTML = "";
+  const today = new Date().getDate();
+  outgoings.sort((a, b) => a.date - b.date);
+
+  outgoings.forEach((item, index) => {
+    const paid = today >= item.date;
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><input value="${item.name}" onchange="updateOutgoing(${index}, 'name', this.value)" /></td>
+      <td><input type="number" value="${item.amount.toFixed(2)}" onchange="updateOutgoing(${index}, 'amount', parseFloat(this.value))" /></td>
+      <td><input type="number" value="${item.date}" onchange="updateOutgoing(${index}, 'date', parseInt(this.value))" min="1" max="31" /></td>
+      <td class="${paid ? "paid" : "not-paid"}">${paid ? "Paid" : "Not Paid"}</td>
+      <td><button onclick="deleteOutgoing(${index})">&#10006;</button></td>
+    `;
+    outgoingsTable.appendChild(row);
+  });
+}
+
+function updateOutgoing(index, field, value) {
+  if (field === "amount" || field === "date") {
+    if (isNaN(value) || value === "") return;
+  }
+  outgoings[index][field] = value;
+  saveOutgoings();
+  calculateRemaining();
+  renderOutgoings();
+}
+
+function deleteOutgoing(index) {
+  outgoings.splice(index, 1);
+  saveOutgoings();
+  renderOutgoings();
+  calculateRemaining();
+}
+
+// -------------------------
+// CALCULATIONS
+// -------------------------
+
+function calculateRemaining() {
+  const incomeVal = parseFloat(incomeInput.value);
+  if (isNaN(incomeVal) || incomeVal <= 0) {
+    disposableEl.textContent = "0.00";
+    remainingOutgoingsEl.textContent = "0.00";
+    paidOutgoingsEl.textContent = "0.00";
+    warningModal.style.display = "none";
+    return;
+  }
+
+  const today = new Date().getDate();
+
+  // Sum unpaid outgoings (date in future)
+  const totalUnpaid = outgoings.reduce(
+    (sum, o) => (today < o.date ? sum + o.amount : sum),
+    0
+  );
+
+  // Sum paid outgoings (date reached or past)
+  const totalPaid = outgoings.reduce(
+    (sum, o) => (today >= o.date ? sum + o.amount : sum),
+    0
+  );
+
+  // Disposable income = income - all outgoings (paid + unpaid)
+  const disposableIncome = incomeVal - totalPaid - totalUnpaid;
+
+  disposableEl.textContent = disposableIncome > 0 ? disposableIncome.toFixed(2) : "0.00";
+  remainingOutgoingsEl.textContent = totalUnpaid.toFixed(2);
+  paidOutgoingsEl.textContent = totalPaid.toFixed(2);
+
+  if (disposableIncome <= 200) {
+    const displayVal = disposableIncome < 0 ? 0 : disposableIncome.toFixed(2);
+    warningModalText.textContent = `Disposable income remaining is £${displayVal}`;
+    warningModal.style.display = "block";
+  } else {
+    warningModal.style.display = "none";
+  }
+}
+
+// -------------------------
+// MODAL CONTROLS
+// -------------------------
+
+openModalBtn.onclick = () => {
+  modal.style.display = "block";
+};
+
+closeModalBtn.onclick = () => {
+  modal.style.display = "none";
+};
+
+closeWarningModalBtn.onclick = () => {
+  warningModal.style.display = "none";
+};
+
+// -------------------------
+// ADD NEW OUTGOING
+// -------------------------
+
+addOutgoingBtn.onclick = () => {
+  const name = document.getElementById("newName").value.trim();
+  const amount = parseFloat(document.getElementById("newAmount").value);
+  const date = parseInt(document.getElementById("newDate").value);
+
+  if (!name || isNaN(amount) || amount <= 0 || isNaN(date) || date < 1 || date > 31) {
+    alert("Please enter valid outgoing details.");
+    return;
+  }
+
+  outgoings.push({ name, amount, date });
+  saveOutgoings();
+  renderOutgoings();
+  calculateRemaining();
+
+  // Clear inputs
+  document.getElementById("newName").value = "";
+  document.getElementById("newAmount").value = "";
+  document.getElementById("newDate").value = "";
+};
+
+// -------------------------
+// CALCULATE BUTTON
+// -------------------------
+
+calculateBtn.onclick = () => {
+  calculateRemaining();
+};
+
+// Expose updateOutgoing and deleteOutgoing to global scope for inline handlers
+window.updateOutgoing = updateOutgoing;
+window.deleteOutgoing = deleteOutgoing;
