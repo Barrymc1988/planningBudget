@@ -116,5 +116,5 @@ window.onclick = (event) => {
     modal.style.display = "none";
   }
 };
-
+renderOutgoings();
 calculateRemaining();
