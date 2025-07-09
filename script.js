@@ -6,7 +6,8 @@ const addOutgoingBtn = document.getElementById("addOutgoing");
 const outgoingsTable = document.getElementById("outgoingsTable");
 const remainingEl = document.getElementById("remaining");
 
-const outgoings = [
+// Load outgoings from localStorage or use defaults
+const defaultOutgoings = [
   { name: "CHILDCARE", amount: 150.0, date: 1 },
   { name: "CRED", amount: 240.0, date: 1 },
   { name: "KEEP", amount: 300.0, date: 1 },
@@ -29,6 +30,23 @@ const outgoings = [
   { name: "FEE", amount: 5.0, date: 27 },
 ];
 
+let outgoings = [];
+function loadOutgoings() {
+  const saved = localStorage.getItem("outgoings");
+  if (saved) {
+    try {
+      outgoings = JSON.parse(saved);
+    } catch {
+      outgoings = [...defaultOutgoings];
+    }
+  } else {
+    outgoings = [...defaultOutgoings];
+  }
+}
+function saveOutgoings() {
+  localStorage.setItem("outgoings", JSON.stringify(outgoings));
+}
+
 function renderOutgoings() {
   outgoingsTable.innerHTML = "";
   const today = new Date().getDate();
@@ -49,6 +67,7 @@ window.updateOutgoing = (index, key, value) => {
   if (key === "amount" && (isNaN(value) || value < 0)) return;
   if (key === "date" && (isNaN(value) || value < 1 || value > 31)) return;
   outgoings[index][key] = value;
+  saveOutgoings();
   renderOutgoings();
   calculateRemaining();
 };
@@ -94,6 +113,7 @@ addOutgoingBtn.onclick = () => {
   }
 
   outgoings.push({ name, amount, date });
+  saveOutgoings();
   renderOutgoings();
   calculateRemaining();
 
@@ -116,5 +136,8 @@ window.onclick = (event) => {
     modal.style.display = "none";
   }
 };
+
+// Load and render on page load
+loadOutgoings();
 renderOutgoings();
 calculateRemaining();
