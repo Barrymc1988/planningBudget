@@ -75,13 +75,30 @@ td input {
   font-weight: bold;
 }
 
-/* Mobile responsive */
+/* Mobile responsive: Fullscreen modal and scrollable content */
 @media (max-width: 700px) {
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    z-index: 1000;
+    background: rgba(0,0,0,0.5);
+  }
   .modal-content {
-    width: 98vw;
+    width: 100vw;
+    height: 100vh;
     max-width: 100vw;
-    padding: 8px;
-    margin: 10px auto;
+    max-height: 100vh;
+    border-radius: 0;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 1rem;
+    margin: 0;
     font-size: 1em;
   }
 
