@@ -1,0 +1,109 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 600px;
+  border-radius: 8px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+}
+
+input {
+  margin: 3px 0;
+  padding: 4px;
+}
+
+button {
+  margin-top: 8px;
+  padding: 6px 10px;
+}
+
+.table-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+  width: 100%;
+  white-space: nowrap;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  margin-top: 10px;
+}
+
+thead th, tbody td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: left;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+td input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px;
+}
+
+.paid {
+  color: green;
+  font-weight: bold;
+}
+
+.not-paid {
+  color: red;
+  font-weight: bold;
+}
+
+/* Mobile responsive */
+@media (max-width: 700px) {
+  .modal-content {
+    width: 98vw;
+    max-width: 100vw;
+    padding: 8px;
+    margin: 10px auto;
+    font-size: 1em;
+  }
+
+  .table-wrapper {
+    max-height: 40vh;
+    font-size: 0.95em;
+  }
+
+  table {
+    font-size: 0.95em;
+  }
+
+  input, button {
+    font-size: 1em;
+    width: 100%;
+  }
+
+  h3, h4 {
+    font-size: 1.1em;
+  }
+
+  th, td {
+    padding: 4px;
+  }
+}
