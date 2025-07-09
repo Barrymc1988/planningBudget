@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Add this above your loginSection -->
   <div id="registerSection">
     <h3>Register</h3>
     <input type="text" id="regUsername" placeholder="Choose a username" />
@@ -46,13 +45,15 @@
             </tr>
           </thead>
           <tbody id="outgoingsTable"></tbody>
+          <tfoot>
+            <tr>
+              <td><strong>Paid Outgoings</strong></td>
+              <td colspan="4" id="paidOutgoings" style="font-weight:bold;">£0.00</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
-      <!-- Paid Outgoings displayed above remaining outgoings -->
-      <div>
-        <strong>Paid Outgoings: £<span id="paidOutgoings">0.00</span></strong>
-      </div>
       <div>
         <strong>Remaining Outgoings: £<span id="remainingOutgoings">0.00</span></strong>
       </div>
