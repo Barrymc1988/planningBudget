@@ -68,6 +68,10 @@ function calculateRemaining() {
 
   document.getElementById("remainingOutgoings").textContent = notPaidSum.toFixed(2);
 
+  // Disposable income is now remaining income - remaining outgoings
+  const disposableIncome = remaining - notPaidSum;
+  document.getElementById("disposableIncome").textContent = disposableIncome.toFixed(2);
+
   if (notPaidSum >= remaining) {
     remainingEl.style.color = "red";
   } else if (remaining - notPaidSum <= 100) {
