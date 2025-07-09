@@ -41,7 +41,6 @@ button {
   border: 1px solid #ddd;
   margin-top: 10px;
   width: 100%;
-  /* white-space: nowrap; */ /* Removed to allow wrapping */
 }
 
 table {
@@ -55,7 +54,6 @@ thead th, tbody td {
   border: 1px solid #ddd;
   padding: 6px;
   text-align: left;
-  /* white-space: nowrap; */ /* Removed to allow wrapping */
   box-sizing: border-box;
 }
 
@@ -75,7 +73,6 @@ td input {
   font-weight: bold;
 }
 
-/* Mobile responsive: Fullscreen modal and scrollable content */
 @media (max-width: 700px) {
   .modal {
     position: fixed;
@@ -124,3 +121,4 @@ td input {
   th, td {
     padding: 4px;
   }
+}
