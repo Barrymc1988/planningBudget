@@ -41,7 +41,7 @@ button {
   border: 1px solid #ddd;
   margin-top: 10px;
   width: 100%;
-  white-space: nowrap;
+  /* white-space: nowrap; */ /* Removed to allow wrapping */
 }
 
 table {
@@ -55,7 +55,7 @@ thead th, tbody td {
   border: 1px solid #ddd;
   padding: 6px;
   text-align: left;
-  white-space: nowrap;
+  /* white-space: nowrap; */ /* Removed to allow wrapping */
   box-sizing: border-box;
 }
 
@@ -103,8 +103,9 @@ td input {
   }
 
   .table-wrapper {
-    max-height: 40vh;
+    max-height: 50vh;
     font-size: 0.95em;
+    overflow-x: auto;
   }
 
   table {
@@ -123,4 +124,3 @@ td input {
   th, td {
     padding: 4px;
   }
-}
