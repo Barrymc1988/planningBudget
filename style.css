@@ -1,66 +1,32 @@
 body {
   font-family: Arial, sans-serif;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-  background-color: #fff;
-  margin: 5% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 600px;
-  border-radius: 8px;
-  max-height: 80vh;
-  overflow: hidden;
-  box-sizing: border-box;
-  position: relative;
-}
-
-input {
-  margin: 3px 0;
-  padding: 4px;
-}
-
-button {
-  margin-top: 8px;
-  padding: 6px 10px;
-}
-
-.table-wrapper {
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: auto;
-  border: 1px solid #ddd;
-  margin-top: 10px;
-  width: 100%;
+  margin: 20px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9em;
-  margin-top: 10px;
+  font-size: 0.95em;
+  margin-bottom: 0.95rem;
 }
 
 thead th, tbody td {
   border: 1px solid #ddd;
-  padding: 6px;
+  padding: 8px;
   text-align: left;
-  box-sizing: border-box;
 }
 
-td input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 4px;
+tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+button {
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+button:focus {
+  outline: none;
 }
 
 .paid {
@@ -73,52 +39,87 @@ td input {
   font-weight: bold;
 }
 
-@media (max-width: 700px) {
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-    z-index: 1000;
-    background: rgba(0,0,0,0.5);
-  }
+input[type="text"], input[type="number"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  margin: 4px 0;
+}
+
+/* Make login and register inputs all 50% width and same height */
+#loginSection input[type="text"],
+#registerSection input[type="text"],
+#registerSection input[type="password"] {
+  width: 50%;
+  box-sizing: border-box;
+  padding: 6px;
+  margin: 8px 0;
+  display: block;
+  height: 36px;
+}
+
+/* Summary text spacing */
+#paidOutgoings, #remainingOutgoings, #disposableIncome {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* Add space between summary lines */
+#paidOutgoings {
+  margin-bottom: 25px;
+}
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #888;
+  width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  position: relative;
+  max-width: 95%;
+}
+
+@media (max-width: 640px) {
   .modal-content {
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
-    border-radius: 0;
-    overflow-y: auto;
-    box-sizing: border-box;
-    padding: 1rem;
-    margin: 0;
-    font-size: 1em;
+    width: 95% !important;
+    max-height: 90vh;
+    margin: 10% auto;
+    padding: 15px;
   }
+}
 
-  .table-wrapper {
-    max-height: 50vh;
-    font-size: 0.95em;
-    overflow-x: auto;
-  }
+#warningMessage {
+  font-size: 1.2em;
+  font-weight: bold;
+}
 
-  table {
-    font-size: 0.95em;
-  }
+/* New classes for disposable colour */
+.disposable-green {
+  color: green;
+  font-weight: bold;
+}
 
-  input, button {
-    font-size: 1em;
-    width: 100%;
-  }
+.disposable-orange {
+  color: orange;
+  font-weight: bold;
+}
 
-  h3, h4 {
-    font-size: 1.1em;
-  }
-
-  th, td {
-    padding: 4px;
-  }
+.disposable-red {
+  color: red;
+  font-weight: bold;
 }
