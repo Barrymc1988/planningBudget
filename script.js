@@ -1,36 +1,34 @@
-// Elements
 const registerSection = document.getElementById("registerSection");
-const loginSection = document.getElementById("loginSection");
-const appSection = document.getElementById("appSection");
-
 const registerBtn = document.getElementById("registerBtn");
+const regUsername = document.getElementById("regUsername");
+const regPassword = document.getElementById("regPassword");
+
+const loginSection = document.getElementById("loginSection");
 const loginBtn = document.getElementById("loginBtn");
-
 const usernameInput = document.getElementById("username");
-const regUsernameInput = document.getElementById("regUsername");
-const regPasswordInput = document.getElementById("regPassword");
 
-const openModalBtn = document.getElementById("openModal");
 const modal = document.getElementById("budgetModal");
 const closeModalBtn = document.getElementById("closeModal");
-
-const incomeInput = document.getElementById("income");
-const calculateBtn = document.getElementById("calculate");
+const warningModal = document.getElementById("warningModal");
+const closeWarningModal = document.getElementById("closeWarningModal");
 
 const outgoingsTable = document.getElementById("outgoingsTable");
-const remainingOutgoingsEl = document.getElementById("remainingOutgoings");
 const disposableEl = document.getElementById("disposableIncome");
+const remainingOutgoingsEl = document.getElementById("remainingOutgoings");
 const paidOutgoingsEl = document.getElementById("paidOutgoings");
+const incomeInput = document.getElementById("income");
+const warningModalMessage = document.getElementById("warningModalText");
 
-const addOutgoingBtn = document.getElementById("addOutgoing");
+closeModalBtn.onclick = () => modal.style.display = "none";
+closeWarningModal.onclick = () => warningModal.style.display = "none";
 
-const warningModal = document.getElementById("warningModal");
-const warningModalText = document.getElementById("warningModalText");
-const closeWarningModalBtn = document.getElementById("closeWarningModal");
+window.onclick = (e) => {
+  if (e.target === modal) modal.style.display = "none";
+  if (e.target === warningModal) warningModal.style.display = "none";
+};
 
 let currentUser = null;
 
-// Default outgoings hardcoded
 const defaultOutgoings = [
   { name: "CHILDCARE", amount: 150, date: 1 },
   { name: "CRED", amount: 240, date: 1 },
@@ -38,7 +36,7 @@ const defaultOutgoings = [
   { name: "LOTTOS", amount: 200, date: 1 },
   { name: "VEHICLE TAX", amount: 60, date: 1 },
   { name: "CAR INS", amount: 59, date: 1 },
-  { name: "CAPITAL ONE", amount: 17.8, date: 2 },
+  { name: "CAPITAL ONE", amount: 17.80, date: 2 },
   { name: "CAPITAL ONE", amount: 15.35, date: 2 },
   { name: "ISA", amount: 200, date: 2 },
   { name: "CREATION", amount: 28.29, date: 3 },
@@ -52,205 +50,141 @@ const defaultOutgoings = [
   { name: "PHONE", amount: 10, date: 23 },
   { name: "DIESEL", amount: 150, date: 27 },
   { name: "FEE", amount: 5, date: 27 },
-  { name: "Rent", amount: 100, date: 1 },
+  { name: "Rent", amount: 100, date: 1 }
 ];
 
 let outgoings = [];
 
-// -------------------------
-// USER AUTH SIMPLIFIED
-// -------------------------
+function hash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString();
+}
 
 registerBtn.onclick = () => {
-  const regUsername = regUsernameInput.value.trim();
-  const regPassword = regPasswordInput.value.trim();
-
-  if (!regUsername || !regPassword) {
-    alert("Please enter username and password to register.");
-    return;
-  }
-
-  if (localStorage.getItem(`user_${regUsername}`)) {
-    alert("Username already exists, please choose another.");
-    return;
-  }
-
-  localStorage.setItem(`user_${regUsername}`, regPassword);
-  alert("Registered! Please log in.");
-  regUsernameInput.value = "";
-  regPasswordInput.value = "";
+  const username = regUsername.value.trim();
+  const password = regPassword.value;
+  if (!username || !password) return alert("Please enter a username and password.");
+  const users = JSON.parse(localStorage.getItem("users") || "{}");
+  if (users[username]) return alert("Username already exists.");
+  users[username] = hash(password);
+  localStorage.setItem("users", JSON.stringify(users));
+  alert("Registration successful!");
+  regUsername.value = "";
+  regPassword.value = "";
 };
 
 loginBtn.onclick = () => {
   const username = usernameInput.value.trim();
-  if (!username) {
-    alert("Please enter your username.");
+  const password = prompt("Enter your password:");
+  const users = JSON.parse(localStorage.getItem("users") || "{}");
+  if (!users[username] || users[username] !== hash(password)) {
+    alert("Invalid username or password.");
     return;
   }
-
-  const storedPassword = localStorage.getItem(`user_${username}`);
-  if (!storedPassword) {
-    alert("User not found. Please register.");
-    return;
-  }
-
   currentUser = username;
-  registerSection.style.display = "none";
   loginSection.style.display = "none";
-  appSection.style.display = "block";
-
+  registerSection.style.display = "none";
   loadOutgoings();
   renderOutgoings();
-  calculateRemaining();
+  showBudgetModal();
 };
 
-// -------------------------
-// OUTGOINGS MANAGEMENT
-// -------------------------
+function showBudgetModal() {
+  modal.style.display = "block";
+}
 
 function loadOutgoings() {
-  const saved = localStorage.getItem(`outgoings_${currentUser}`);
-  if (saved) {
-    outgoings = JSON.parse(saved);
-  } else {
-    outgoings = defaultOutgoings.slice();
-    saveOutgoings();
-  }
+  if (!currentUser) return;
+  const saved = localStorage.getItem("outgoings_" + currentUser);
+  outgoings = saved ? JSON.parse(saved) : [...defaultOutgoings];
 }
 
 function saveOutgoings() {
-  localStorage.setItem(`outgoings_${currentUser}`, JSON.stringify(outgoings));
+  if (!currentUser) return;
+  localStorage.setItem("outgoings_" + currentUser, JSON.stringify(outgoings));
 }
 
 function renderOutgoings() {
   outgoingsTable.innerHTML = "";
   const today = new Date().getDate();
   outgoings.sort((a, b) => a.date - b.date);
-
   outgoings.forEach((item, index) => {
     const paid = today >= item.date;
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td><input value="${item.name}" onchange="updateOutgoing(${index}, 'name', this.value)" /></td>
-      <td><input type="number" value="${item.amount.toFixed(2)}" onchange="updateOutgoing(${index}, 'amount', parseFloat(this.value))" /></td>
-      <td><input type="number" value="${item.date}" onchange="updateOutgoing(${index}, 'date', parseInt(this.value))" min="1" max="31" /></td>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.name}</td>
+      <td>£${item.amount.toFixed(2)}</td>
+      <td>${item.date}</td>
       <td class="${paid ? "paid" : "not-paid"}">${paid ? "Paid" : "Not Paid"}</td>
-      <td><button onclick="deleteOutgoing(${index})">&#10006;</button></td>
+      <td><button onclick="deleteOutgoing(${index})" style="color:red;">&#10006;</button></td>
     `;
-    outgoingsTable.appendChild(row);
+    outgoingsTable.appendChild(tr);
   });
+  calculateRemaining();
 }
 
-function updateOutgoing(index, field, value) {
-  if (field === "amount" || field === "date") {
-    if (isNaN(value) || value === "") return;
+window.deleteOutgoing = (index) => {
+  if (confirm("Delete this outgoing?")) {
+    outgoings.splice(index, 1);
+    saveOutgoings();
+    renderOutgoings();
   }
-  outgoings[index][field] = value;
-  saveOutgoings();
-  calculateRemaining();
-  renderOutgoings();
-}
-
-function deleteOutgoing(index) {
-  outgoings.splice(index, 1);
-  saveOutgoings();
-  renderOutgoings();
-  calculateRemaining();
-}
-
-// -------------------------
-// CALCULATIONS
-// -------------------------
+};
 
 function calculateRemaining() {
-  const incomeVal = parseFloat(incomeInput.value);
-  if (isNaN(incomeVal) || incomeVal <= 0) {
-    disposableEl.textContent = "0.00";
-    remainingOutgoingsEl.textContent = "0.00";
-    paidOutgoingsEl.textContent = "0.00";
-    warningModal.style.display = "none";
-    return;
+  const income = parseFloat(incomeInput.value) || 0;
+  const today = new Date().getDate();
+  let paid = 0, unpaid = 0;
+  outgoings.forEach(o => {
+    if (today >= o.date) paid += o.amount;
+    else unpaid += o.amount;
+  });
+  let disposable = income - (paid + unpaid);
+  disposable = Math.max(0, disposable);
+
+  disposableEl.textContent = disposable.toFixed(2);
+
+  disposableEl.className = "";
+  if (disposable < 100) {
+    disposableEl.classList.add("disposable-red");
+  } else if (disposable <= 200) {
+    disposableEl.classList.add("disposable-orange");
+  } else {
+    disposableEl.classList.add("disposable-green");
   }
 
-  const today = new Date().getDate();
+  paidOutgoingsEl.textContent = paid.toFixed(2);
+  remainingOutgoingsEl.textContent = unpaid.toFixed(2);
 
-  // Sum unpaid outgoings (date in future)
-  const totalUnpaid = outgoings.reduce(
-    (sum, o) => (today < o.date ? sum + o.amount : sum),
-    0
-  );
-
-  // Sum paid outgoings (date reached or past)
-  const totalPaid = outgoings.reduce(
-    (sum, o) => (today >= o.date ? sum + o.amount : sum),
-    0
-  );
-
-  // Disposable income = income - all outgoings (paid + unpaid)
-  const disposableIncome = incomeVal - totalPaid - totalUnpaid;
-
-  disposableEl.textContent = disposableIncome > 0 ? disposableIncome.toFixed(2) : "0.00";
-  remainingOutgoingsEl.textContent = totalUnpaid.toFixed(2);
-  paidOutgoingsEl.textContent = totalPaid.toFixed(2);
-
-  if (disposableIncome <= 200) {
-    const displayVal = disposableIncome < 0 ? 0 : disposableIncome.toFixed(2);
-    warningModalText.textContent = `Disposable income remaining is £${displayVal}`;
+  if (disposable <= 200) {
+    warningModalMessage.textContent = `Disposable income remaining is £${disposable.toFixed(2)}`;
+    warningModalMessage.style.color =
+      disposable < 100 ? "red" :
+      disposable <= 200 ? "orange" : "green";
     warningModal.style.display = "block";
   } else {
     warningModal.style.display = "none";
   }
 }
 
-// -------------------------
-// MODAL CONTROLS
-// -------------------------
-
-openModalBtn.onclick = () => {
-  modal.style.display = "block";
-};
-
-closeModalBtn.onclick = () => {
-  modal.style.display = "none";
-};
-
-closeWarningModalBtn.onclick = () => {
-  warningModal.style.display = "none";
-};
-
-// -------------------------
-// ADD NEW OUTGOING
-// -------------------------
-
-addOutgoingBtn.onclick = () => {
+document.getElementById("addOutgoing").onclick = () => {
   const name = document.getElementById("newName").value.trim();
   const amount = parseFloat(document.getElementById("newAmount").value);
   const date = parseInt(document.getElementById("newDate").value);
-
-  if (!name || isNaN(amount) || amount <= 0 || isNaN(date) || date < 1 || date > 31) {
-    alert("Please enter valid outgoing details.");
+  if (!name || isNaN(amount) || isNaN(date)) {
+    alert("Please fill all outgoing fields.");
     return;
   }
-
   outgoings.push({ name, amount, date });
   saveOutgoings();
   renderOutgoings();
-  calculateRemaining();
-
-  // Clear inputs
   document.getElementById("newName").value = "";
   document.getElementById("newAmount").value = "";
   document.getElementById("newDate").value = "";
 };
 
-// -------------------------
-// CALCULATE BUTTON
-// -------------------------
-
-calculateBtn.onclick = () => {
-  calculateRemaining();
-};
-
-// Expose updateOutgoing and deleteOutgoing to global scope for inline handlers
-window.updateOutgoing = updateOutgoing;
-window.deleteOutgoing = deleteOutgoing;
+incomeInput.addEventListener("input", () => calculateRemaining());
