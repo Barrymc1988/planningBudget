@@ -16,21 +16,24 @@
 
   <div id="loginSection">
     <h3>Login</h3>
-    <input type="text" id="username" placeholder="Enter your name" />
+    <input type="text" id="username" placeholder="Enter your username" />
     <button id="loginBtn">Login</button>
-  </div>
-
-  <div id="appSection" style="display:none;">
-    <button id="openModal">Open Budget Modal</button>
   </div>
 
   <div id="budgetModal" class="modal">
     <div class="modal-content">
       <h3>Monthly Budget</h3>
 
-      <label>Income:</label><br />
-      <input type="number" id="income" placeholder="Enter income" /><br />
-      <button id="calculate">Calculate Remaining</button>
+      <div class="income-disposable-container">
+        <div>
+          <label for="income">Income:</label><br />
+          <input type="number" id="income" placeholder="Enter income" value="2459" />
+        </div>
+        <div>
+          <label>Disposable Income:</label>
+          <span id="disposableIncome">0.00</span>
+        </div>
+      </div>
 
       <h4>Outgoings</h4>
       <div class="table-wrapper">
@@ -45,21 +48,13 @@
             </tr>
           </thead>
           <tbody id="outgoingsTable"></tbody>
-          <tfoot>
-            <tr>
-              <td><strong>Paid Outgoings</strong></td>
-              <td colspan="4" id="paidOutgoings" style="font-weight:bold;">£0.00</td>
-            </tr>
-          </tfoot>
         </table>
       </div>
 
-      <div>
-        <strong>Remaining Outgoings: £<span id="remainingOutgoings">0.00</span></strong>
+      <div style="margin-top: 20px;">
+        Paid outgoings: £<span id="paidOutgoings">0.00</span><br />
+        Remaining outgoings: £<span id="remainingOutgoings">0.00</span>
       </div>
-
-      <p><strong>Disposable Income:</strong> <span id="disposableIncome">0.00</span></p>
-      <p id="warningMessage" style="color:red; font-weight:bold; display:none;"></p>
 
       <h4>Add Outgoing</h4>
       <input type="text" id="newName" placeholder="Name" />
